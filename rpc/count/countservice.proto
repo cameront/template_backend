@@ -1,0 +1,27 @@
+// follow https://github.com/twitchtv/twirp/blob/main/docs/best_practices.md
+
+syntax = "proto3";
+
+// package <organization>.<repo>[.<service>];
+package foocompany.template;
+
+option go_package = "rpc/counter";
+
+service Counter {
+  rpc GetValue(CounterRequest) returns (CounterValue);
+  rpc Increment(IncrementRequest) returns (CounterValue);
+}
+
+message CounterRequest {
+  string name = 1;
+}
+
+message IncrementRequest {
+  string name = 1;
+  int64 amount = 2;
+}
+
+message CounterValue {
+  string name = 1;
+  int64 value = 2;
+}
