@@ -17,12 +17,17 @@ go get -d entgo.io/ent/cmd/ent
 go install github.com/cosmtrek/air@latest
 ```
 
+Finally, run the one-time setup script to update repo paths and verify builds.
+
+```
+./scripts/one_time_setup.sh
+```
+
 # How this was created
 
 ```
 go mod init https://github.com/cameront/go-svelte-sqlite-template
 ```
-
 
 ```
 mkdir go-svelte-sqlite-template
@@ -37,7 +42,4 @@ npm install
 popd
 ```
 
-```
-mkdir _app
-```
-
+And then lots of other shit... haha.

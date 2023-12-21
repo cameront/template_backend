@@ -9,12 +9,26 @@ This is a template application I use frequently to spin simple applications up q
 
 The golang backend implements the twirp API server and also serves static FE files (index.html, css, js, etc). The protocol buffer API definition generates both go code for the server implementation and the client-side typescript code the frontend to use. The sqlite db is replicated to S3 (in production) by litestream. 
 
-# How to start
+# How to deploy
 
-TODO: add gonew instructions
-TODO: add instructions to rename the server, the db, and remove the default entities.
+TODO
 
-# Rename ish
+# Things I'd like to improve
+
+1. Serve static files via the go static file server without giving up Hot Module Replacement, so that you don't have to use the node webserver in development.
+
+
+
+# Steps
+
+1. `git clone https://github.com/cameront/go-svelte-sqlite-template [your_directory]`
+1. `./scripts/one_time_setup.sh`
+1. `(source env_dev.sh && air)`
+1. `pushd _ui && npm run dev`
+
+# Optional Additional Steps
+
+## Rename ish
 
 Rename the "count" service to the name of the service ([servicename]) you want to build.
 
@@ -24,21 +38,4 @@ Rename the "count" service to the name of the service ([servicename]) you want t
 1. `mv rpc/count -> rpc/[servicename]`
 1. `rm -rf rpc/count`
 1.  ./scripts/protogen.sh
-1. optionally replace the server port (5001) and the UI dev port (5001) with those of your liking
-
-
-# How to develop
-
-# How to deploy
-
-# Things I'd like to improve
-
-1. Serve static files via the go static file server without giving up Hot Module Replacement
-2.
-
-
-# Steps
-
-1. `git clone https://github.com/cameront/go-svelte-sqlite-template [your_directory]`
-1. `./scripts/setup/setup.sh`
-1. `(source env_dev.sh && air)`
+1. optionally replace the server port (5001) and the UI dev port (5000) with those of your liking
