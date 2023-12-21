@@ -51,4 +51,4 @@ echo "Step 5, migrating database"
 
 echo "Success."
 echo "You can run the backend with '(source ./env-dev.sh && air)'"
-echo "Now would be a good time to set the new upstream too like \"git remote set-url origin https://github.com/OWNER/REPOSITORY.git\""
+echo "Now would be a good time to set the new upstream: \"git remote set-url origin https://github.com/${REPO_NAME}.git\""
