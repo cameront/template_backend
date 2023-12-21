@@ -1,0 +1,32 @@
+
+# Non-commitable artifacts
+data/
+_ui/dist/
+_ui/dist-ssr/
+_ui/node_modules/
+
+# Backup files
+*~
+
+# OS Artifacts
+.DS_STORE
+
+# Logs
+logs
+*.log
+_ui/npm-debug.log*
+_ui/yarn-debug.log*
+_ui/yarn-error.log*
+_ui/pnpm-debug.log*
+_ui/lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

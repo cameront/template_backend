@@ -28,7 +28,7 @@ type loginRequest struct {
 	Password string
 }
 
-// loginHandler reads a json body
+// LoginHandler reads a TODO
 func LoginHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -76,6 +76,7 @@ func LoginHandler() http.Handler {
 	})
 }
 
+// UserAuthenticatingHandler is a handler wrapper that TODO
 func UserAuthenticatingHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
