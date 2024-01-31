@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# This script is used to launch the production (fly.io) app wrapped by the
+# litestream database replicator.
+
+echo "db path is $DB_PATH"
+
+# Exit build script on first failure.
+set -e
+# Echo commands to stdout.
+set -x
+
+if [[ ! -z "${LITESTREAM_CONFIG_PATH}" ]]; then
+  echo "litestream enabled - restoring"
+  # Restore database from S3.
+  /app/litestream restore -if-replica-exists "${DB_PATH}"
+
+  # If this is the first time we're deploying the app, there will be no replica
+  # to restore. This next section will create a new db file if a magic env var
+  # is set.
+  # NOTE: It's best to remove the env var after the first deployment, so that
+  # an error restoring doesn't result in an erasure of the database (by creating
+  # a new one)
+
+  if [[ ! -f ${DB_PATH} ]]; then
+    echo "no database file exists"
+    if [[ ! -z "${DB_FIRST_RUN_MODE}" ]]; then
+      echo "WARNING: running in seed mode we're creating a new one"
+      mkdir -p ${DB_PATH}
+      rmdir ${DB_PATH}
+      touch ${DB_PATH}
+    else
+      echo "should you set DB_FIRST_RUN_MODE to initialize one?"
+    fi
+  fi
+
+  echo "running migrations"
+  /atlas migrate apply --dir "file:///app/migrations" --url "sqlite://${DB_PATH}?_fk=1&_journal_mode=WAL" ${DIRTY_FLAG}
+
+  echo "replicating"
+  # Let Litestream start the server as a child process
+  exec /app/litestream replicate -exec "/app/server"
+else
+  echo "litestream not enabled"
+
+  echo "running migrations"
+  /atlas migrate apply --dir "file:///app/migrations" --url "sqlite://${DB_PATH}?_fk=1&_journal_mode=WAL"
+
+  # Start server.
+  eval "/app/server"
+fi

@@ -23,6 +23,10 @@ Finally, run the one-time setup script to update repo paths and verify builds.
 ./scripts/one_time_setup.sh
 ```
 
+# Setting up DB Replication
+
+[Litestream Setup](/LITESTREAM_SETUP.md)
+
 # How this was created
 
 ```
