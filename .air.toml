@@ -6,8 +6,8 @@ tmp_dir = "tmp"
   args_bin = []
   bin = "./tmp/main"
   cmd = "go build -o ./tmp/main cmd/server/server.go"
-  delay = 100
-  exclude_dir = ["_ui", "data", "scripts"]
+  delay = 0
+  exclude_dir = ["assets", "tmp", "_ui"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false
@@ -16,12 +16,12 @@ tmp_dir = "tmp"
   include_dir = []
   include_ext = ["go", "tpl", "tmpl", "html"]
   include_file = []
-  kill_delay = "100ms"
+  kill_delay = "50ms"
   log = "build-errors.log"
   poll = false
   poll_interval = 0
   rerun = false
-  rerun_delay = 250
+  rerun_delay = 100
   send_interrupt = false
   stop_on_error = false
 
@@ -37,7 +37,7 @@ tmp_dir = "tmp"
   time = false
 
 [misc]
-  clean_on_exit = true
+  clean_on_exit = false
 
 [screen]
   clear_on_rebuild = false

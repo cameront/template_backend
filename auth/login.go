@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cameront/go-svelte-sqlite-template/log"
+	"github.com/cameront/go-svelte-sqlite-template/logging"
 	"github.com/cristalhq/jwt/v5"
 )
 
@@ -35,14 +35,14 @@ func LoginHandler() http.Handler {
 
 		data, err := io.ReadAll(r.Body)
 		if err != nil {
-			log.GetLogger(ctx).Info("error reading body: %v", err)
+			logging.GetLogger(ctx).Info("error reading body: %v", err)
 			http.Error(w, "error reading body", http.StatusInternalServerError)
 			return
 		}
 
 		l := loginRequest{}
 		if err = json.Unmarshal(data, &l); err != nil {
-			log.GetLogger(ctx).Info("error parsing json: %v", err)
+			logging.GetLogger(ctx).Info("error parsing json: %v", err)
 			http.Error(w, "error parsing json", http.StatusBadRequest)
 			return
 		}
@@ -50,14 +50,14 @@ func LoginHandler() http.Handler {
 		// Obviously you'd want to either do an oauth flow or consult the db for real user info before setting the cookie.
 		if l.Username != "meuser" {
 			http.Error(w, "unknown user", http.StatusInternalServerError)
-			log.GetLogger(ctx).Info("unknown user")
+			logging.GetLogger(ctx).Info("unknown user")
 			return
 		}
 
 		if l.Password != "pass123" {
 			// ...and probably not return a different error on unknown user vs. wrong password!
 			http.Error(w, "invalid username/password", http.StatusInternalServerError)
-			log.GetLogger(ctx).Info("invalid password")
+			logging.GetLogger(ctx).Info("invalid password")
 			return
 		}
 
@@ -65,7 +65,7 @@ func LoginHandler() http.Handler {
 		expires := time.Now().Add(twoDays)
 		token, err := buildToken("123", l.Username, l.Username+"@example.com", "none", expires)
 		if err != nil {
-			log.GetLogger(ctx).Info("error building token: %v", err)
+			logging.GetLogger(ctx).Info("error building token: %v", err)
 			http.Error(w, "error building jwt token", http.StatusInternalServerError)
 			return
 		}
@@ -83,14 +83,14 @@ func UserAuthenticatingHandler(next http.Handler) http.Handler {
 
 		cookie, err := r.Cookie(authCookieKey)
 		if err != nil {
-			log.GetLogger(ctx).Info("no cookie found")
+			logging.GetLogger(ctx).Info("no cookie found")
 			http.Error(w, "no cookie found", http.StatusUnauthorized)
 			return
 		}
 
 		userClaims, err := validateToken(cookie.Value)
 		if err != nil {
-			log.GetLogger(ctx).Info("invalid token")
+			logging.GetLogger(ctx).Info("invalid token")
 			http.Error(w, "not authorized", http.StatusUnauthorized)
 			return
 		}

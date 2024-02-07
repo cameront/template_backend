@@ -3,7 +3,7 @@ export AUTH_API_RESTRICTED="false"
 
 # Litestream not on in dev
 
-export DB_FILE="./data/database.db" # just used in scripts, not config
+export DB_FILE="./data/database.db" # NOTE: referenced from scripts
 export DB_URI="file:${DB_FILE}?mode=rw&cache=shared&_journal_mode=WAL&_fk=1"
 export DB_DRIVER_NAME="sqlite3"
 

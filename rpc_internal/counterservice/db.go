@@ -7,7 +7,7 @@ import (
 
 	"github.com/cameront/go-svelte-sqlite-template/config"
 	"github.com/cameront/go-svelte-sqlite-template/ent"
-	"github.com/cameront/go-svelte-sqlite-template/log"
+	"github.com/cameront/go-svelte-sqlite-template/logging"
 )
 
 func InitStore(ctx context.Context) (*clientWrapper, error) {
@@ -55,7 +55,7 @@ func WithTransaction[O any](ctx context.Context, db dbProvider, fn func(context.
 
 	out, err := fn(ctx, txClient)
 	if err != nil {
-		log.GetLogger(ctx).Error("rolling back transaction")
+		logging.GetLogger(ctx).Error("rolling back transaction")
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
 			// hmm, likely sorts screwed here!?
 			slog.Error(fmt.Sprintf("rollback err: %v", rollbackErr))

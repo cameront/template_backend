@@ -10,12 +10,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cameront/go-svelte-sqlite-template/log"
+	"github.com/cameront/go-svelte-sqlite-template/logging"
 )
 
 // handleStatic serves the static assets (i.e. the entire frontend app)
 func InitStatic(ctx context.Context, staticPath string) http.HandlerFunc {
-	logger := log.With(nil, "initiator", "static")
+	logger := logging.With(nil, "initiator", "static")
 
 	uiPath := http.Dir(staticPath)
 	return func(w http.ResponseWriter, r *http.Request) {

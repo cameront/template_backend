@@ -9,7 +9,7 @@ import (
 
 	"github.com/cameront/go-svelte-sqlite-template/config"
 	"github.com/cameront/go-svelte-sqlite-template/http"
-	"github.com/cameront/go-svelte-sqlite-template/log"
+	"github.com/cameront/go-svelte-sqlite-template/logging"
 
 	"github.com/cameront/go-svelte-sqlite-template/rpc_internal/counterservice"
 
@@ -21,7 +21,7 @@ func main() {
 	panicIf(err, "error initializing config")
 	cfg := config.MustContext(ctx)
 
-	logger := log.InitLogging(cfg)
+	logger := logging.InitLogging(cfg)
 
 	// receiving a signal on this channel keeps the server alive for another
 	// IdleTimeoutMS
@@ -69,10 +69,10 @@ func startCloseTimer(ctx context.Context, shutdownMS int64, requests <-chan stru
 		case <-requests:
 			t.Reset(duration)
 		case <-t.C:
-			log.GetLogger(ctx).Info(fmt.Sprintf("shutting down after %d ms", shutdownMS))
+			logging.GetLogger(ctx).Info(fmt.Sprintf("shutting down after %d ms", shutdownMS))
 			for i, fn := range closeFns {
 				if err := fn(); err != nil {
-					log.GetLogger(ctx).Error("error calling close fn %d: %v", i, err)
+					logging.GetLogger(ctx).Error("error calling close fn %d: %v", i, err)
 				}
 			}
 			return

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/cameront/go-svelte-sqlite-template/auth"
-	"github.com/cameront/go-svelte-sqlite-template/log"
+	"github.com/cameront/go-svelte-sqlite-template/logging"
 	"github.com/segmentio/ksuid"
 	"github.com/twitchtv/twirp"
 )
@@ -27,13 +27,13 @@ func NewLoggingInterceptor() twirp.Interceptor {
 
 			serviceName, _ := twirp.ServiceName(ctx)
 			methodName, _ := twirp.MethodName(ctx)
-			logger := log.GetLogger(ctx).
+			logger := logging.GetLogger(ctx).
 				With("initiator", "rpc").
 				With("traceId", ksuid.New()).
 				With("method", fmt.Sprintf("%s.%s", serviceName, methodName)).
 				With("user", fmt.Sprintf("%s", ctx.Value(auth.UserCtxKey))).
 				With("payload", fmt.Sprintf("%+v", req))
-			ctx = log.SetLogger(ctx, logger)
+			ctx = logging.SetLogger(ctx, logger)
 
 			logger.Info("begin request")
 			res, err := next(ctx, req)
