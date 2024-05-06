@@ -10,6 +10,35 @@ import (
 	"github.com/cameront/go-svelte-sqlite-template/logging"
 )
 
+/*
+
+It might be nice for some applications to separate read/write connections.
+Especially in situations where you want consistend reads (e.g. don't want to see
+new rows in between queries of the same table that were added by a committed
+transaction by some other thread).
+
+In WAL mode, you can have deferred transactions that just keep your reads
+consistent. You can only have one writer (which should use BEGIN IMMEDIATE to
+ensure that only one writer is attempting to acquire the lock at any one time)
+
+So you'd basically initialize twice, once for reads and once for writes
+
+read_params:  "?mode=ro&_txlock=deferred"
+write_params: "?mode=rw&_journal=WAL&_timeout=5000&_fk=true&_sync=NORMAL&_txlock=immediate"
+
+And you'd have your DbProvider make two functions:
+ReadTx(ctx, ...) which uses the read client
+WriteTx(ctx, ...) which uses the write client
+
+These would replace the WithTransaction function today
+
+See also:
+ https://github.com/mattn/go-sqlite3/issues/1022#issuecomment-1067353980
+ https://phiresky.github.io/blog/2020/sqlite-performance-tuning/
+ https://github.com/mattn/go-sqlite3/issues/1179
+
+*/
+
 func InitStore(ctx context.Context) (*clientWrapper, error) {
 	cfg := config.MustContext(ctx)
 

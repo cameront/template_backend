@@ -2,6 +2,7 @@ package logging
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -44,4 +45,30 @@ func GetLogger(ctx context.Context) *slog.Logger {
 
 func SetLogger(ctx context.Context, logger *slog.Logger) context.Context {
 	return context.WithValue(ctx, ctxKey, logger)
+}
+
+func Debugf(ctx context.Context, format string, args ...any) {
+	logSkipCaller(ctx, GetLogger(ctx), slog.LevelDebug, format, args...)
+}
+
+func Infof(ctx context.Context, format string, args ...any) {
+	logSkipCaller(ctx, GetLogger(ctx), slog.LevelInfo, format, args...)
+}
+
+func Warnf(ctx context.Context, format string, args ...any) {
+	logSkipCaller(ctx, GetLogger(ctx), slog.LevelWarn, format, args...)
+}
+
+func Errorf(ctx context.Context, format string, args ...any) {
+	logSkipCaller(ctx, GetLogger(ctx), slog.LevelError, format, args...)
+}
+
+func logSkipCaller(ctx context.Context, logger *slog.Logger, level slog.Level, format string, args ...any) {
+	if !logger.Enabled(ctx, level) {
+		return
+	}
+	var pcs [2]uintptr
+	runtime.Callers(2, pcs[:]) // skip [Callers, Infof]
+	r := slog.NewRecord(time.Now(), level, fmt.Sprintf(format, args...), pcs[1])
+	_ = logger.Handler().Handle(ctx, r)
 }

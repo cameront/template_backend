@@ -2,9 +2,9 @@
 
 set -e
 
-if [ $# -eq 0 ]
-  then
-    echo "Usage: ./db_migration_create.sh [MIGRATION_NAME]"
+if [ $# -eq 0 ]; then
+  echo "Usage: ./db_migration_create.sh [MIGRATION_NAME]"
+  exit 1
 fi
 
 FAMILAIR_DIRS=("./ent" "./rpc")
