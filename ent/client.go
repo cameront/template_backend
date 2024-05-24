@@ -9,12 +9,12 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/cameront/go-svelte-sqlite-template/ent/migrate"
+	"github.com/cameront/template_backend/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
-	"github.com/cameront/go-svelte-sqlite-template/ent/counter"
+	"github.com/cameront/template_backend/ent/counter"
 )
 
 // Client is the client that holds all ent builders.

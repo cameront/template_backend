@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/cameront/go-svelte-sqlite-template/ent/counter"
+	"github.com/cameront/template_backend/ent/counter"
 )
 
 // Counter is the model entity for the Counter schema.

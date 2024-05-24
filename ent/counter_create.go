@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/cameront/go-svelte-sqlite-template/ent/counter"
+	"github.com/cameront/template_backend/ent/counter"
 )
 
 // CounterCreate is the builder for creating a Counter entity.

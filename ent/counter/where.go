@@ -4,7 +4,7 @@ package counter
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"github.com/cameront/go-svelte-sqlite-template/ent/predicate"
+	"github.com/cameront/template_backend/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

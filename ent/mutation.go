@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/cameront/go-svelte-sqlite-template/ent/counter"
-	"github.com/cameront/go-svelte-sqlite-template/ent/predicate"
+	"github.com/cameront/template_backend/ent/counter"
+	"github.com/cameront/template_backend/ent/predicate"
 )
 
 const (

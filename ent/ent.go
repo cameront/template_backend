@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/cameront/go-svelte-sqlite-template/ent/counter"
+	"github.com/cameront/template_backend/ent/counter"
 )
 
 // ent aliases to avoid import conflicts in user's code.

@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cameront/go-svelte-sqlite-template/ent"
+	"github.com/cameront/template_backend/ent"
 )
 
 // The CounterFunc type is an adapter to allow the use of ordinary

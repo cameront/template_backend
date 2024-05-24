@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/cameront/go-svelte-sqlite-template/ent"
+	"github.com/cameront/template_backend/ent"
 	// required by schema hooks.
-	_ "github.com/cameront/go-svelte-sqlite-template/ent/runtime"
+	_ "github.com/cameront/template_backend/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/cameront/go-svelte-sqlite-template/ent/migrate"
+	"github.com/cameront/template_backend/ent/migrate"
 )
 
 type (
