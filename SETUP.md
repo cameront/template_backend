@@ -30,12 +30,12 @@ Finally, run the one-time setup script to update repo paths and verify builds.
 # How this was created
 
 ```
-go mod init https://github.com/cameront/go-svelte-sqlite-template
+go mod init https://github.com/cameront/template_backend
 ```
 
 ```
-mkdir go-svelte-sqlite-template
-cd go-svelte-sqlite-template
+mkdir template_backend
+cd template_backend
 ```
 
 ```

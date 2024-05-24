@@ -1,11 +1,11 @@
-# go-svelte-sqlite-template
+# template_backend
 
 This is a template application I use frequently to spin simple applications up quickly. The stack is essentially:
 
-* DB: Sqlite (schema managed by Atlas)
-* Backend: Golang
+* DB: Sqlite (schema managed by [Atlas](https://atlasgo.io/), entities managed by [Ent](https://entgo.io/))
+* Backend: Go
 * Frontend: Svelte (in Typescript)
-* RPC API: Twirp
+* RPC API: [Twirp](https://github.com/twitchtv/twirp)
 
 The golang backend implements the twirp API server and also serves static FE files (index.html, css, js, etc). The protocol buffer API definition generates both go code for the server implementation and the client-side typescript code the frontend to use. The sqlite db is replicated to S3 (in production) by litestream. 
 
@@ -16,12 +16,11 @@ TODO
 # Things I'd like to improve
 
 1. Serve static files via the go static file server without giving up Hot Module Replacement, so that you don't have to use the node webserver in development.
-
-
+1. Split the one_time_setup script into 2 different scripts: onetime/rename_repo.sh and onetime/verify.sh, so that the latter can be used when changes need to be made to this (template) repo but you want to try out the working demo before comitting changes.
 
 # Steps
 
-1. `git clone https://github.com/cameront/go-svelte-sqlite-template [your_directory]`
+1. `git clone https://github.com/cameront/template_backend [your_directory]`
 1. `./scripts/one_time_setup.sh`
 1. `(source env_dev.sh && air)`
 1. `pushd _ui && npm run dev`

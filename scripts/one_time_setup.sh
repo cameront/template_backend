@@ -39,9 +39,9 @@ title() {
 
 { title "Step 1: renaming Go module and Go import paths"; } 2>/dev/null
 # go module name
-sed -i '' "s@go-svelte-sqlite-template@${REPO_NAME}@g" go.mod
+sed -i '' "s@template_backend@${REPO_NAME}@g" go.mod
 # go import paths
-find ./ -name '*.go' -exec sed -i '' "s@go-svelte-sqlite-template@${REPO_NAME}@g" {} \;
+find ./ -name '*.go' -exec sed -i '' "s@template_backend@${REPO_NAME}@g" {} \;
 
 { title "Step 2: verifying backend"; } 2>/dev/null
 go get ./...

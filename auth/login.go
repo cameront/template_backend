@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cameront/go-svelte-sqlite-template/logging"
+	"github.com/cameront/template_backend/logging"
 	"github.com/cristalhq/jwt/v5"
 )
 

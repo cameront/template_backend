@@ -10,7 +10,7 @@ export DB_DRIVER_NAME="sqlite3"
 export HTTP_STATIC_DIR="_ui/dist"
 export HTTP_IDLE_SHUTDOWN_MS="0"
 
-export LOG_LEVEL="debug"
+export LOG_LEVEL="-4"
 export LOG_OUTPUT_FORMAT="text"
 
 export RPC_HOST=""

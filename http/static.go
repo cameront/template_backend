@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/cameront/go-svelte-sqlite-template/logging"
+	"github.com/cameront/template_backend/logging"
 )
 
 // handleStatic serves the static assets (i.e. the entire frontend app)

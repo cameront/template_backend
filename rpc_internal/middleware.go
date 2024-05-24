@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cameront/go-svelte-sqlite-template/auth"
-	"github.com/cameront/go-svelte-sqlite-template/logging"
+	"github.com/cameront/template_backend/auth"
+	"github.com/cameront/template_backend/logging"
+	
 	"github.com/segmentio/ksuid"
 	"github.com/twitchtv/twirp"
 )

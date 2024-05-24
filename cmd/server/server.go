@@ -7,11 +7,11 @@ import (
 	stdhttp "net/http"
 	"time"
 
-	"github.com/cameront/go-svelte-sqlite-template/config"
-	"github.com/cameront/go-svelte-sqlite-template/http"
-	"github.com/cameront/go-svelte-sqlite-template/logging"
+	"github.com/cameront/template_backend/config"
+	"github.com/cameront/template_backend/http"
+	"github.com/cameront/template_backend/logging"
 
-	"github.com/cameront/go-svelte-sqlite-template/rpc_internal/counterservice"
+	"github.com/cameront/template_backend/rpc_internal/counterservice"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,7 +21,7 @@ func main() {
 	panicIf(err, "error initializing config")
 	cfg := config.MustContext(ctx)
 
-	logger := logging.InitLogging(cfg)
+	logger := logging.InitLogging(cfg.LOG_OutputFormat, cfg.LOG_MinLevel)
 
 	// receiving a signal on this channel keeps the server alive for another
 	// IdleTimeoutMS

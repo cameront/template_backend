@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"path"
 
-	"github.com/cameront/go-svelte-sqlite-template/auth"
-	"github.com/cameront/go-svelte-sqlite-template/config"
+	"github.com/cameront/template_backend/auth"
+	"github.com/cameront/template_backend/config"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 )

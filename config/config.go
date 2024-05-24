@@ -21,7 +21,7 @@ type Config struct {
 	HTTP_StaticDir      string `env:"HTTP_STATIC_DIR" envDefault:"_ui/public"`
 	HTTP_IdleShutdownMS int64  `env:"HTTP_IDLE_SHUTDOWN_MS"`
 
-	LOG_MinLevel     string `env:"LOG_LEVEL" envDefault:"debug"`
+	LOG_MinLevel     int `env:"LOG_LEVEL" envDefault:"-4"` // debug
 	LOG_OutputFormat string `env:"LOG_OUTPUT_FORMAT"`
 
 	RPC_Host       string `env:"RPC_HOST"`

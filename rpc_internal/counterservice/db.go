@@ -1,13 +1,16 @@
 package counterservice
 
+// TODO: move out of rpc, since you may have other modules (e.g. scheduled tasks) that want to use the database
+// See example in hvm_listings
+
 import (
 	"context"
 	"fmt"
 	"log/slog"
 
-	"github.com/cameront/go-svelte-sqlite-template/config"
-	"github.com/cameront/go-svelte-sqlite-template/ent"
-	"github.com/cameront/go-svelte-sqlite-template/logging"
+	"github.com/cameront/template_backend/config"
+	"github.com/cameront/template_backend/ent"
+	"github.com/cameront/template_backend/logging"
 )
 
 /*

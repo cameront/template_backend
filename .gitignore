@@ -4,12 +4,9 @@ data/
 _ui/dist/
 _ui/dist-ssr/
 _ui/node_modules/
-
-# Backup files
 *~
-
-# OS Artifacts
 .DS_STORE
+tmp/
 
 # Logs
 logs

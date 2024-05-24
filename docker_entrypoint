@@ -3,14 +3,22 @@
 # This script is used to launch the production (fly.io) app wrapped by the
 # litestream database replicator.
 
-echo "db path is $DB_FILE"
-
 # Exit build script on first failure.
 set -e
 # Echo commands to stdout.
 set -x
 
-if [[ ! -z "${LITESTREAM_CONFIG_PATH}" ]]; then
+echo "db url is $DB_FILE"
+if [[ -n ${DB_FILE} ]]; then
+  # We're seeing an issue sometimes when the db path already exists (before
+  # restoration). I think it's probably in situations when we have a failed
+  # deployment, and so the container had previously restored. In that case,
+  # just delete the db so that the restore can succeed below.
+  rm -f "$DB_PATH"
+fi
+
+
+if [[ -n ${LITESTREAM_CONFIG_PATH} ]]; then
   echo "litestream enabled - restoring"
   # Restore database from S3.
   /app/litestream restore -if-replica-exists "${DB_FILE}"

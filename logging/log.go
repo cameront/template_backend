@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-
-	"github.com/cameront/go-svelte-sqlite-template/config"
+	"runtime"
+	"time"
 )
 
 type contextKeyType string
@@ -15,10 +15,10 @@ const ctxKey contextKeyType = "_log"
 
 var log *slog.Logger
 
-func InitLogging(cfg *config.Config) *slog.Logger {
-	handlerOptions := &slog.HandlerOptions{AddSource: true}
+func InitLogging(outputFormat string, minLogLevel int) *slog.Logger {
+	handlerOptions := &slog.HandlerOptions{AddSource: true, Level: slog.Level(minLogLevel)}
 	var handler slog.Handler
-	if cfg.LOG_OutputFormat == "json" {
+	if outputFormat == "json" {
 		handler = slog.NewJSONHandler(os.Stdout, handlerOptions)
 	} else {
 		handler = slog.NewTextHandler(os.Stdout, handlerOptions)

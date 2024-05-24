@@ -1,4 +1,4 @@
-module github.com/cameront/go-svelte-sqlite-template
+module github.com/cameront/template_backend
 
 go 1.21.1
 

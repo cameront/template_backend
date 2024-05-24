@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/cameront/go-svelte-sqlite-template/ent"
-	rpc "github.com/cameront/go-svelte-sqlite-template/rpc/count"
-	internal "github.com/cameront/go-svelte-sqlite-template/rpc_internal"
+	"github.com/cameront/template_backend/ent"
+	rpc "github.com/cameront/template_backend/rpc/count"
+	internal "github.com/cameront/template_backend/rpc_internal"
 
 	"github.com/twitchtv/twirp"
 )
