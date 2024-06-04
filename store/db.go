@@ -1,4 +1,4 @@
-package counterservice
+package store
 
 // TODO: move out of rpc, since you may have other modules (e.g. scheduled tasks) that want to use the database
 // See example in hvm_listings
@@ -60,7 +60,7 @@ const (
 	inTxKey ctxKey = "inTx"
 )
 
-func WithTransaction[O any](ctx context.Context, db dbProvider, fn func(context.Context, *ent.Client) (out O, err error)) (O, error) {
+func WithTransaction[O any](ctx context.Context, db DbProvider, fn func(context.Context, *ent.Client) (out O, err error)) (O, error) {
 	dummyO := new(O)
 
 	client := db.Get(ctx)
@@ -100,7 +100,7 @@ func WithTransaction[O any](ctx context.Context, db dbProvider, fn func(context.
 
 // We should always retrieve the db client from context, so that we don't leak
 // outside our own transactions. This goofy little interface helps enforce that.
-type dbProvider interface {
+type DbProvider interface {
 	// Get() is used by callers that don't care whether they're inside of a txn
 	Get(ctx context.Context) (client *ent.Client)
 	// GetTx() is used by callers that do care whether they're inside of a txn

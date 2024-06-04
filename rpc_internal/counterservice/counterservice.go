@@ -9,20 +9,21 @@ import (
 	"github.com/cameront/template_backend/ent"
 	rpc "github.com/cameront/template_backend/rpc/count"
 	internal "github.com/cameront/template_backend/rpc_internal"
+	"github.com/cameront/template_backend/store"
 
 	"github.com/twitchtv/twirp"
 )
 
 // Server implements the Counter service
 type Server struct {
-	DbClient *clientWrapper
+	DbClient store.DbProvider
 }
 
 func InitApi(ctx context.Context, pathPrefix string, requestsReceived chan<- struct{}) (http.Handler, func() error, error) {
 	// We assume migrations have already been applied by atlas in this point
 	// by either the dev environment (air script) or in production (docker
 	// step)
-	dbClient, err := InitStore(ctx)
+	dbClient, err := store.InitStore(ctx)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error initializing database %v", err)
 	}
@@ -58,7 +59,7 @@ func (s *Server) GetValue(ctx context.Context, req *rpc.CounterRequest) (*rpc.Co
 		return 0, err
 	}
 
-	val, err := WithTransaction(ctx, s.DbClient, op)
+	val, err := store.WithTransaction(ctx, s.DbClient, op)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +90,7 @@ func (s *Server) Increment(ctx context.Context, req *rpc.IncrementRequest) (*rpc
 		return newValue, err
 	}
 
-	val, err := WithTransaction(ctx, s.DbClient, op)
+	val, err := store.WithTransaction(ctx, s.DbClient, op)
 	if err != nil {
 		return nil, err
 	}

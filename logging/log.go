@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path"
 	"runtime"
 	"time"
 )
@@ -16,7 +17,16 @@ const ctxKey contextKeyType = "_log"
 var log *slog.Logger
 
 func InitLogging(outputFormat string, minLogLevel int) *slog.Logger {
-	handlerOptions := &slog.HandlerOptions{AddSource: true, Level: slog.Level(minLogLevel)}
+	handlerOptions := &slog.HandlerOptions{
+	  AddSource: true,
+	  ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+                        if a.Key == slog.SourceKey {
+                                s := a.Value.Any().(*slog.Source)
+                                s.File = path.Base(s.File)
+                        }
+                        return a
+                },
+	  Level: slog.Level(minLogLevel)}
 	var handler slog.Handler
 	if outputFormat == "json" {
 		handler = slog.NewJSONHandler(os.Stdout, handlerOptions)
