@@ -3,10 +3,13 @@ package logging
 import (
 	"context"
 	"fmt"
+	stdlog "log"
 	"log/slog"
 	"os"
 	"path"
 	"runtime"
+	"runtime/debug"
+	"strings"
 	"time"
 )
 
@@ -16,17 +19,41 @@ const ctxKey contextKeyType = "_log"
 
 var log *slog.Logger
 
+// If we can tell the package path, we strip that from our log lines because
+// it's a lot of text that is all very repetitive "github.com/foo/bar/zee/..."
+var packagePath = ""
+
+func init() {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		stdlog.Println("no debug.ReadBuildInfo available. perhaps not building in module mode!?")
+		return
+	}
+	if info.Path == "command-line-arguments" {
+		// This usually indicates that you're building in a way that doesn't
+		// include the module info. Perhaps you're building like:
+		// go build -o /some/bin ./cmd/app/main.go
+		// instead of go build -o /some/bin ./cmd/app?
+		stdlog.Println("module appears misconfigured (info.Path = 'command-line-arguments')")
+		return
+	}
+	packagePath = info.Main.Path
+}
+
 func InitLogging(outputFormat string, minLogLevel int) *slog.Logger {
 	handlerOptions := &slog.HandlerOptions{
-	  AddSource: true,
-	  ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
-                        if a.Key == slog.SourceKey {
-                                s := a.Value.Any().(*slog.Source)
-                                s.File = path.Base(s.File)
-                        }
-                        return a
-                },
-	  Level: slog.Level(minLogLevel)}
+		AddSource: true,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.SourceKey {
+				s := a.Value.Any().(*slog.Source)
+				s.File = path.Base(s.File)
+				if packagePath != "" {
+					s.Function = strings.TrimPrefix(s.Function, packagePath)
+				}
+			}
+			return a
+		},
+		Level: slog.Level(minLogLevel)}
 	var handler slog.Handler
 	if outputFormat == "json" {
 		handler = slog.NewJSONHandler(os.Stdout, handlerOptions)

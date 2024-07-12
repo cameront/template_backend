@@ -14,7 +14,7 @@ Install go tools: ProtoGen helps generate code from our API definition, ent mana
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 go install github.com/twitchtv/twirp/protoc-gen-twirp@latest
 go get -d entgo.io/ent/cmd/ent
-go install github.com/cosmtrek/air@latest
+go install github.com/air-verse/air@latest
 ```
 
 Finally, run the one-time setup script to update repo paths and verify builds.

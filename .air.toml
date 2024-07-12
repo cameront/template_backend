@@ -1,44 +1,45 @@
 root = "."
-testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  args_bin = []
-  bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main cmd/server/server.go"
-  delay = 0
-  exclude_dir = ["assets", "tmp", "_ui"]
-  exclude_file = []
-  exclude_regex = ["_test.go"]
-  exclude_unchanged = false
-  follow_symlink = false
-  full_bin = ""
-  include_dir = []
-  include_ext = ["go", "tpl", "tmpl", "html"]
-  include_file = []
-  kill_delay = "50ms"
-  log = "build-errors.log"
-  poll = false
-  poll_interval = 0
-  rerun = false
-  rerun_delay = 100
-  send_interrupt = false
-  stop_on_error = false
-
-[color]
-  app = ""
-  build = "yellow"
-  main = "magenta"
-  runner = "green"
-  watcher = "cyan"
+cmd = "go build -o ./tmp/main ./cmd/server/"
+bin = "tmp/main"
+full_bin = "source ./env-dev.sh && ./tmp/main"
+args_bin = []
+include_ext = ["go", "html"]
+exclude_dir = ["data", "scripts", "tmp", "_ui"]
+exclude_regex = ["_test\\.go"]
+exclude_unchanged = true
+follow_symlink = false
+log = "air.log"
+poll = false
+poll_interval = 500 # ms
+delay = 100 # ms
+stop_on_error = true
+send_interrupt = true
+kill_delay = 500 # nanosecond
+rerun = false
+rerun_delay = 500
 
 [log]
-  main_only = false
-  time = false
+time = false
+main_only = false
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
 
 [misc]
-  clean_on_exit = false
+clean_on_exit = true
 
 [screen]
-  clear_on_rebuild = false
-  keep_scroll = true
+clear_on_rebuild = false
+keep_scroll = true
+
+# Enable live-reloading on the browser.
+[proxy]
+  enabled = false
+  proxy_port = 8090
+  app_port = 8080
