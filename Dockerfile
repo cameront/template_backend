@@ -34,7 +34,7 @@ WORKDIR /_ui
 
 COPY _ui/*.json _ui/*.js _ui/*.cjs /_ui
 COPY _ui/src /_ui/src
-COPY _ui/public /_ui/public
+COPY _ui/dist /_ui/dist
 # Dont' want artifacts from dev to leak through
 RUN rm /_ui/public/build/*
 
@@ -69,7 +69,7 @@ FROM alpine:3.18
 RUN apk add --no-cache bash
 
 COPY --from=backend_builder /app/server /app/server
-COPY --from=ui_builder /_ui/public /app/_ui/public
+COPY --from=ui_builder /_ui/dist /app/_ui/dist
 COPY --from=litestream_downloader /usr/local/bin/litestream /app/litestream
 COPY --from=atlas_image /atlas /atlas
 

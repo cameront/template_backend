@@ -35,14 +35,14 @@ func LoginHandler() http.Handler {
 
 		data, err := io.ReadAll(r.Body)
 		if err != nil {
-			logging.GetLogger(ctx).Info("error reading body: %v", err)
+			logging.Infof(ctx, "error reading body: %v", err)
 			http.Error(w, "error reading body", http.StatusInternalServerError)
 			return
 		}
 
 		l := loginRequest{}
 		if err = json.Unmarshal(data, &l); err != nil {
-			logging.GetLogger(ctx).Info("error parsing json: %v", err)
+			logging.Infof(ctx, "error parsing json: %v", err)
 			http.Error(w, "error parsing json", http.StatusBadRequest)
 			return
 		}

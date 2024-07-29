@@ -18,7 +18,7 @@ type Config struct {
 
 	AUTH_JWTSecret string `env:"AUTH_JWT_SECRET,required"`
 
-	HTTP_StaticDir      string `env:"HTTP_STATIC_DIR" envDefault:"_ui/public"`
+	HTTP_StaticDir      string `env:"HTTP_STATIC_DIR" envDefault:"_ui/dist"`
 	HTTP_IdleShutdownMS int64  `env:"HTTP_IDLE_SHUTDOWN_MS"`
 
 	LOG_MinLevel     int `env:"LOG_LEVEL" envDefault:"-4"` // debug

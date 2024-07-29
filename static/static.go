@@ -1,4 +1,4 @@
-package http
+package static
 
 import (
 	"context"
@@ -14,10 +14,14 @@ import (
 )
 
 // handleStatic serves the static assets (i.e. the entire frontend app)
-func InitStatic(ctx context.Context, staticPath string) http.HandlerFunc {
-	logger := logging.With(nil, "initiator", "static")
-
+func InitStatic(ctx context.Context, mux *http.ServeMux, staticPath string) {
 	uiPath := http.Dir(staticPath)
+
+	loggerCtx := logging.SetLogger(ctx, logging.GetLogger(ctx).With("initiator", "static"))
+	mux.HandleFunc("/", getStaticHandlerFunc(loggerCtx, uiPath))
+}
+
+func getStaticHandlerFunc(ctx context.Context, uiPath http.Dir) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
@@ -31,11 +35,11 @@ func InitStatic(ctx context.Context, staticPath string) http.HandlerFunc {
 		file, err := uiPath.Open(path)
 		if err != nil {
 			if os.IsNotExist(err) {
-				logger.Info(fmt.Sprintf("file %s not found: %s", path, err))
+				logging.Infof(ctx, "file %s not found: %v", path, err)
 				http.NotFound(w, r)
 				return
 			}
-			logger.Info(fmt.Sprintf("file %s cannot be read: %s", path, err))
+			logging.Infof(ctx, "file %s cannot be read: %v", path, err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -51,7 +55,7 @@ func InitStatic(ctx context.Context, staticPath string) http.HandlerFunc {
 		}
 
 		n, _ := io.Copy(w, file)
-		logger.Info(fmt.Sprintf("file %s copied %d bytes", path, n))
+		logging.Debugf(ctx, "file %s copied %d bytes", path, n)
 	}
 }
 

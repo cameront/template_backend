@@ -4,12 +4,15 @@ import (
 	"context"
 	"fmt"
 	stdlog "log"
-	stdhttp "net/http"
+	"net/http"
 	"time"
 
+	"github.com/cameront/template_backend/auth"
 	"github.com/cameront/template_backend/config"
-	"github.com/cameront/template_backend/http"
 	"github.com/cameront/template_backend/logging"
+	"github.com/cameront/template_backend/static"
+	"github.com/cameront/template_backend/store"
+	"github.com/rs/cors"
 
 	"github.com/cameront/template_backend/rpc_internal/counterservice"
 
@@ -23,33 +26,42 @@ func main() {
 
 	logger := logging.InitLogging(cfg.LOG_OutputFormat, cfg.LOG_MinLevel)
 
+	dbClient, err := store.InitStore(ctx)
+	panicIf(err, "initializind db")
+
 	// receiving a signal on this channel keeps the server alive for another
 	// IdleTimeoutMS
 	requestsReceived := make(chan struct{}, 5)
 
-	rpcHandler, apiClose, err := counterservice.InitApi(ctx, cfg.RPC_PathPrefix, requestsReceived)
+	mux := http.NewServeMux()
+
+	apiClose, err := counterservice.InitApi(ctx, dbClient, mux, cfg.RPC_PathPrefix, requestsReceived)
 	panicIf(err, "initializing api")
 
-	staticHandler := http.InitStatic(ctx, cfg.HTTP_StaticDir)
+	mux.Handle("POST /login", auth.LoginHandler())
 
-	router, err := http.InitRouter(ctx, staticHandler, rpcHandler)
-	panicIf(err, "initializing http")
+	static.InitStatic(ctx, mux, cfg.HTTP_StaticDir)
 
+	c := cors.New(cors.Options{
+		AllowOriginFunc:  func(origin string) bool { return true },
+		AllowedMethods:   []string{http.MethodPost, http.MethodOptions},
+		AllowCredentials: true,
+	})
 	addr := fmt.Sprintf("%s:%s", cfg.RPC_Host, cfg.RPC_Port)
-	httpServer := &stdhttp.Server{Addr: addr, Handler: router}
+	httpServer := &http.Server{Addr: addr, Handler: c.Handler(mux)}
+
 	closeServer := func() error {
 		err := httpServer.Close()
-		if err != stdhttp.ErrServerClosed {
+		if err != http.ErrServerClosed {
 			return err
 		}
 		return apiClose()
 	}
-
 	go startCloseTimer(ctx, cfg.HTTP_IdleShutdownMS, requestsReceived, []func() error{closeServer})
 
 	logger.Info(fmt.Sprintf("listening on %s", addr))
 	err = httpServer.ListenAndServe()
-	if err != stdhttp.ErrServerClosed {
+	if err != http.ErrServerClosed {
 		panicIf(err, "server")
 	}
 }

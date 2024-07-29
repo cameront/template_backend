@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/cameront/template_backend/auth"
 	"github.com/cameront/template_backend/ent"
 	rpc "github.com/cameront/template_backend/rpc/count"
 	internal "github.com/cameront/template_backend/rpc_internal"
@@ -16,30 +17,34 @@ import (
 
 // Server implements the Counter service
 type Server struct {
-	DbClient store.DbProvider
+	db store.DbProvider
 }
 
-func InitApi(ctx context.Context, pathPrefix string, requestsReceived chan<- struct{}) (http.Handler, func() error, error) {
-	// We assume migrations have already been applied by atlas in this point
-	// by either the dev environment (air script) or in production (docker
-	// step)
-	dbClient, err := store.InitStore(ctx)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error initializing database %v", err)
-	}
+func InitApi(ctx context.Context, dbProvider store.DbProvider, mux *http.ServeMux, pathPrefix string, requestsReceived chan<- struct{}) (func() error, error) {
 
-	server := &Server{DbClient: dbClient} // implements service interface
+	server := &Server{db: dbProvider}
 	rpcHandler := rpc.NewCounterServer(server,
 		twirp.WithServerInterceptors(
 			internal.NewSignalInterceptor(requestsReceived),
 			internal.NewLoggingInterceptor()),
 		twirp.WithServerPathPrefix(pathPrefix))
 
+	if !strings.HasPrefix(pathPrefix, "/") {
+		return nil, fmt.Errorf("path prefix (%s) must begin with '/'", pathPrefix)
+	}
+	if strings.HasSuffix(pathPrefix, "/") {
+		return nil, fmt.Errorf("path prefix (%s) must not end with '/'", pathPrefix)
+	}
+
+	path := fmt.Sprintf("POST %s/", pathPrefix)
+	mux.Handle(path, auth.UserAuthenticatingHandler(rpcHandler))
+
 	closeFn := func() error {
-		dbClient.Close()
+		c := dbProvider.Get(ctx)
+		c.Close()
 		return nil
 	}
-	return rpcHandler, closeFn, nil
+	return closeFn, nil
 }
 
 func (s *Server) GetValue(ctx context.Context, req *rpc.CounterRequest) (*rpc.CounterValue, error) {
@@ -59,7 +64,7 @@ func (s *Server) GetValue(ctx context.Context, req *rpc.CounterRequest) (*rpc.Co
 		return 0, err
 	}
 
-	val, err := store.WithTransaction(ctx, s.DbClient, op)
+	val, err := store.WithTransaction(ctx, s.db, op)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +95,7 @@ func (s *Server) Increment(ctx context.Context, req *rpc.IncrementRequest) (*rpc
 		return newValue, err
 	}
 
-	val, err := store.WithTransaction(ctx, s.DbClient, op)
+	val, err := store.WithTransaction(ctx, s.db, op)
 	if err != nil {
 		return nil, err
 	}
