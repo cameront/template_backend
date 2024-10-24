@@ -34,6 +34,11 @@ You'll get the error "no matching backups found" if you haven't yet replicated t
 
 To avoid the catch-22 situation described below, you may want to seed the production db with one you have on your local filesystem.
 
+If you don't yet have a database to replicate, you can just create an empty one.
+```
+touch data/path-to-database.db
+```
+
 ```
 export GOOGLE_APPLICATION_CREDENTIALS="gcp_service_account_database_replicator.json"
 litestream replicate data/path-to-database.db gcs://${BACKUPS_BUCKET_NAME}/some-backups-folder

@@ -1,4 +1,4 @@
 dbs:
-  - path: /app/data/some_file_path.db
+  - path: ${DB_FILE}
     replicas:
-      - url: gcs://some-bucket-name/some-folder-name
+      - url: ${DB_REPLICA_URL}

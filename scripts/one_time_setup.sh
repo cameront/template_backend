@@ -39,7 +39,7 @@ title() {
 
 { title "Step 1: renaming Go module and Go import paths"; } 2>/dev/null
 # go module name
-sed -i '' "s@template_backend@${REPO_NAME}@g" go.mod
+sed -i '' "s@cameront/template_backend@${REPO_NAME}@g" go.mod
 # go import paths
 find ./ -name '*.go' -exec sed -i '' "s@template_backend@${REPO_NAME}@g" {} \;
 

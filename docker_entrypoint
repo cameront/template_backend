@@ -15,40 +15,21 @@ if [[ -f ${DB_FILE} ]]; then
   # deployment, and so the container had previously restored. In that case,
   # just delete the db so that the restore can succeed below.
   echo "db file already exists. removing it."
-  rm -f "$DB_PATH"
+  rm -f "$DB_FILE"
 fi
 
 
 if [[ -n ${LITESTREAM_CONFIG_PATH} ]]; then
   echo "litestream enabled - restoring"
   # Restore database from S3.
-  /app/litestream restore -if-replica-exists "${DB_FILE}"
-
-  # If this is the first time we're deploying the app, there will be no replica
-  # to restore. This next section will create a new db file if a magic env var
-  # is set.
-  # NOTE: It's best to remove the env var after the first deployment, so that
-  # an error restoring doesn't result in an erasure of the database (by creating
-  # a new one)
-
-  if [[ ! -f ${DB_FILE} ]]; then
-    echo "no database file exists"
-    if [[ ! -z "${DB_FIRST_RUN_MODE}" ]]; then
-      echo "WARNING: running in seed mode we're creating a new one"
-      mkdir -p ${DB_FILE}
-      rmdir ${DB_FILE}
-      touch ${DB_FILE}
-    else
-      echo "should you set DB_FIRST_RUN_MODE to initialize one?"
-    fi
-  fi
+  litestream restore -if-replica-exists "${DB_FILE}"
 
   echo "running migrations"
-  /atlas migrate apply --dir "file:///app/migrations" --url "sqlite://${DB_FILE}?_fk=1&_journal_mode=WAL" ${DIRTY_FLAG}
+  /atlas migrate apply --dir "file:///app/migrations" --url "sqlite://${DB_FILE}?_fk=1&_journal_mode=WAL"
 
-  echo "replicating"
+  echo "starting replication"
   # Let Litestream start the server as a child process
-  exec /app/litestream replicate -exec "/app/server"
+  exec litestream replicate -exec "/app/server"
 else
   echo "litestream not enabled"
 

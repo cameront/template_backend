@@ -22,11 +22,16 @@ export function getRpcHost() {
   return url;
 }
 
-let transport = new TwirpFetchTransport({
-  baseUrl: getRpcHost() + "/rpc",
-  // this is only necessary because in dev we run the UI and RPC servers on
-  // different ports.
-  fetchInit: { credentials: 'include' },
-});
+function getTransport(path: string) {
+  return new TwirpFetchTransport({
+    baseUrl: getRpcHost() + path,
+    // this is only necessary because in dev we run the UI and RPC servers on
+    // different ports.
+    fetchInit: { credentials: 'include' },
+  });
+}
 
-export const client = new CounterClient(transport);
+export const client = new CounterClient(getTransport("/rpc/");
+// other clients can be added with different prefixes like
+// export const counterClient = new CounterClient(getTransport("/rpc/counter/");
+// export const otherClient = new OtherClient(getTransport("/rpc/other/");
