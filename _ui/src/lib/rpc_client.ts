@@ -31,7 +31,7 @@ function getTransport(path: string) {
   });
 }
 
-export const client = new CounterClient(getTransport("/rpc/");
+export const client = new CounterClient(getTransport("/rpc/"));
 // other clients can be added with different prefixes like
 // export const counterClient = new CounterClient(getTransport("/rpc/counter/");
 // export const otherClient = new OtherClient(getTransport("/rpc/other/");

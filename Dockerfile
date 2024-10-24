@@ -1,14 +1,23 @@
+ARG GO_VERSION=1.23
+ARG LITESTREAM_VERSION=v0.3.13
+ARG ATLAS_VERSION=0.28.1
+
 #
 # Stage 1 - build binary (on debian)
 #
-ARG GO_VERSION=1.23
-FROM golang:${GO_VERSION}-bookworm as backend_builder
+FROM golang:${GO_VERSION}-bookworm AS backend_builder
 
 WORKDIR /app
 COPY go.* /app
-COPY *.go /app
-COPY stuff/ /app/stuff
-#... COPY [folder] /app/folder
+COPY auth /app/auth
+COPY cmd /app/cmd
+COPY config /app/config
+COPY ent /app/ent
+COPY logging /app/logging
+COPY rpc /app/rpc
+COPY rpc_internal /app/rpc_internal
+COPY static /app/static
+COPY store /app/store
 
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=readonly -v -o /app/server ./cmd/server
@@ -17,7 +26,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=readonly -v -o /app/serv
 #
 # Stage 2 - build frontend
 #
-FROM node:23-bookworm as ui_builder
+FROM node:23-bookworm AS ui_builder
 
 WORKDIR /_ui
 COPY _ui/*.json _ui/*.js _ui/*.ts _ui/*.html /_ui
@@ -33,16 +42,16 @@ RUN npm run build
 #
 FROM debian:bookworm-slim AS litestream_downloader
 
-ARG litestream_version="v0.3.13"
-ADD https://github.com/benbjohnson/litestream/releases/download/${litestream_version}/litestream-${litestream_version}-linux-amd64.tar.gz /tmp/litestream.tar.gz
+ARG LITESTREAM_VERSION
+ADD https://github.com/benbjohnson/litestream/releases/download/${LITESTREAM_VERSION}/litestream-${LITESTREAM_VERSION}-linux-amd64.tar.gz /tmp/litestream.tar.gz
 RUN tar -C /usr/local/bin -xzf /tmp/litestream.tar.gz
 
 
 #
 # Stage 4 - add atlas
 #
-ARG atlas_version="0.28.1"
-FROM arigaio/atlas:${atlas_version} AS atlas_image
+ARG ATLAS_VERSION
+FROM arigaio/atlas:${ATLAS_VERSION} AS atlas_image
 
 
 #

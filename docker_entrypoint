@@ -19,8 +19,8 @@ if [[ -f ${DB_FILE} ]]; then
 fi
 
 
-if [[ -n ${LITESTREAM_CONFIG_PATH} ]]; then
-  echo "litestream enabled - restoring"
+if [[ -n ${DB_REPLICA_URL} ]]; then
+  echo "litestream enabled. restoring from replica url ${DB_REPLICA_URL}"
   # Restore database from S3.
   litestream restore -if-replica-exists "${DB_FILE}"
 
