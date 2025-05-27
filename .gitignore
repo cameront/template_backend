@@ -16,6 +16,7 @@ _ui/yarn-debug.log*
 _ui/yarn-error.log*
 _ui/pnpm-debug.log*
 _ui/lerna-debug.log*
+_ui/package-lock.json
 
 # Editor directories and files
 .vscode/*

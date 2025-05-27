@@ -1,6 +1,5 @@
 <script lang="ts">
   import { client } from "../lib/rpc_client";
-  import { Button, Card, Input, Label } from "flowbite-svelte";
 
   let counterName = "";
   let tmpCounterName = "default";
@@ -45,18 +44,25 @@
   setAndFetch();
 </script>
 
-<div class="max-w-sm mx-auto">
+<div class="flex justify-center mt-10">
   {#if error !== ""}
-    <div class="error">{error}</div>
+    <div class="max-w-[300px] error">{error}</div>
   {:else if loading}
     <div>Loading...</div>
   {:else}
-    <Card>
+    <div>
       <div class="mb-6">
-        <Label for="name-input" class="block mb-2">Counter Name</Label>
+        <label for="name-input" class="block mb-2">Counter Name</label>
         <div class="flex flex-row gap-4">
-          <Input id="name-input" size="lg" bind:value={tmpCounterName} />
-          <Button color="light" on:click={setAndFetch}>Set</Button>
+          <input
+            id="name-input"
+            class="text-lg p-2 border border-gray-100"
+            bind:value={tmpCounterName}
+          />
+          <button
+            class="border p-2 rounded-md hover:bg-gray-50"
+            onclick={setAndFetch}>Set</button
+          >
         </div>
       </div>
       <div class="text-center">
@@ -66,13 +72,16 @@
           Value: {count}
         </h5>
 
-        <Button color="green" class="w-fit" on:click={incrementCounter}
-          >Increment</Button
+        <button color="green" class="w-fit" onclick={incrementCounter}
+          >Increment</button
         >
       </div>
-    </Card>
+    </div>
   {/if}
 </div>
 
 <style>
+  .error {
+    color: red;
+  }
 </style>

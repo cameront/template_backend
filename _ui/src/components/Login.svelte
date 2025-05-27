@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { Button, Card, Input, Label } from "flowbite-svelte";
     import { getRpcHost } from "../lib/rpc_client";
     import { authCookie } from "../lib/stores";
-    import { navigate } from "svelte-routing";
+    import { navigate } from "svelte5-router";
 
-    let username = "meuser";
-    let password = "pass123";
-    let error = "";
+    let username = $state("meuser");
+    let password = $state("pass123");
+    let error = $state("");
 
-    async function login() {
+    async function login(e: Event) {
+        e.preventDefault();
         try {
             const response = await fetch(getRpcHost() + "/login", {
                 method: "POST",
@@ -33,24 +33,28 @@
     }
 </script>
 
-<Card class="mx-auto">
-    <form>
+<div class="flex justify-center">
+    <form class="mt-10">
         <div class="mb-6">
-            <Label for="name-input" class="block mb-2">Username</Label>
-            <Input id="name-input" size="lg" bind:value={username} />
+            <label for="name-input" class="block mb-2">Username</label>
+            <input
+                class="text-lg p-2 border border-gray-100"
+                id="name-input"
+                bind:value={username}
+            />
         </div>
         <div class="mb-6">
-            <Label for="password-input" class="block mb-2">Password</Label>
-            <Input
+            <label for="password-input" class="block mb-2">Password</label>
+            <input
                 type="password"
                 id="password-input"
-                size="lg"
+                class="text-lg p-2 border border-gray-100"
                 bind:value={password}
             />
         </div>
-        <Button class="w-fit" color="blue" on:click={login}>Login</Button>
+        <button class="w-fit" color="blue" onclick={login}>Login</button>
     </form>
-</Card>
+</div>
 
 {#if error}
     <div class="text-center p-5 text-red-700">{error}</div>

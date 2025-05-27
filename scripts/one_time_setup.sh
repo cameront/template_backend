@@ -41,7 +41,7 @@ title() {
 # go module name
 sed -i '' "s@cameront/template_backend@${REPO_NAME}@g" go.mod
 # go import paths
-find ./ -name '*.go' -exec sed -i '' "s@template_backend@${REPO_NAME}@g" {} \;
+find ./ -name '*.go' -exec sed -i '' "s@cameront/template_backend@${REPO_NAME}@g" {} \;
 
 { title "Step 2: verifying backend"; } 2>/dev/null
 go get ./...

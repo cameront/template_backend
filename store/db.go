@@ -87,7 +87,7 @@ func WithTransaction[O any](ctx context.Context, db DbProvider, fn func(context.
 
 	out, err := fn(ctx, txClient)
 	if err != nil {
-		logging.GetLogger(ctx).Error("rolling back transaction")
+		logging.Errorf(ctx, "rolling back transaction due to error: %v", err)
 		if rollbackErr := tx.Rollback(); rollbackErr != nil {
 			// hmm, likely sorts screwed here!?
 			slog.Error(fmt.Sprintf("rollback err: %v", rollbackErr))

@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { CaretUpSolid, FingerprintSolid } from "flowbite-svelte-icons";
-    import { Link } from "svelte-routing";
+    import caretUp from "../assets/caretup.svg";
+    import { Link } from "svelte5-router";
     import { authCookie } from "../lib/stores";
     import { onDestroy } from "svelte";
     import { authCookieName } from "../lib/constants";
+    import Fingerprint from "../icons/Fingerprint.svelte";
 
     let hasAuthcookie = false;
 
@@ -35,7 +36,7 @@
                     to="/"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                 >
-                    <CaretUpSolid class="w-6 h-6 text-gray-500" />
+                    <img src={caretUp} alt="caret" width="20" height="20" />
                     <span class="flex-1 ms-3 whitespace-nowrap">Counter</span>
                 </Link>
             </li>
@@ -45,9 +46,9 @@
                     to="/login"
                     class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                 >
-                    <FingerprintSolid
-                        class="w-6 h-6 text-gray-500 inline-block"
-                    />
+                    <div class="text-gray-500">
+                        <Fingerprint width="20" height="20" />
+                    </div>
                     <span class="flex-1 ms-3 whitespace-nowrap">Login</span>
                 </Link>
             </li>
@@ -58,7 +59,7 @@
                 <li>
                     <Link
                         to="/login"
-                        on:click={() => deleteCookie("ac")}
+                        onclick={() => deleteCookie("ac")}
                         class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                     >
                         <svg
