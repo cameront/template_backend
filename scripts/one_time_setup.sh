@@ -49,8 +49,8 @@ go build ./...
 
 { title "Step 3: verifying frontend"; } 2>/dev/null
 pushd _ui 
-npm install
-npm run build
+pnpm install
+pnpm run build
 popd
 
 { title "Step 4: creating a database at data/database.db"; } 2>/dev/null

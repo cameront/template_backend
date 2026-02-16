@@ -55,16 +55,13 @@ func InitStore(ctx context.Context) (*clientWrapper, error) {
 
 type ctxKey string
 
-const (
-	txKey   ctxKey = "tx"
-	inTxKey ctxKey = "inTx"
-)
+const txcKey ctxKey = "txc" // transaction client
 
 func WithTransaction[O any](ctx context.Context, db DbProvider, fn func(context.Context, *ent.Client) (out O, err error)) (O, error) {
 	dummyO := new(O)
 
-	client := db.Get(ctx)
-	if inTx, ok := ctx.Value(inTxKey).(bool); ok && inTx {
+	client, inTx, _ := db.GetTx(ctx, "")
+	if inTx {
 		// We're already inside of a transaction, so just run the function.
 		return fn(ctx, client)
 	}
@@ -75,8 +72,7 @@ func WithTransaction[O any](ctx context.Context, db DbProvider, fn func(context.
 	}
 
 	txClient := tx.Client()
-	ctx = context.WithValue(ctx, txKey, txClient)
-	ctx = context.WithValue(ctx, inTxKey, true)
+	ctx = context.WithValue(ctx, txcKey, txClient)
 
 	defer func() {
 		if v := recover(); v != nil {
@@ -92,7 +88,7 @@ func WithTransaction[O any](ctx context.Context, db DbProvider, fn func(context.
 			// hmm, likely sorts screwed here!?
 			slog.Error(fmt.Sprintf("rollback err: %v", rollbackErr))
 		}
-		return *dummyO, err
+		return out, err
 	}
 	err = tx.Commit()
 	return out, err
@@ -103,8 +99,7 @@ func WithTransaction[O any](ctx context.Context, db DbProvider, fn func(context.
 type DbProvider interface {
 	// Get() is used by callers that don't care whether they're inside of a txn
 	Get(ctx context.Context) (client *ent.Client)
-	// GetTx() is used by callers that do care whether they're inside of a txn
-	GetTx(ctx context.Context, txnRequiredReason string) (client *ent.Client, err error)
+	GetTx(ctx context.Context, txnRequiredReason string) (client *ent.Client, inTxn bool, err error)
 }
 
 type clientWrapper struct {
@@ -116,22 +111,18 @@ func (c *clientWrapper) Close() {
 }
 
 func (c *clientWrapper) Get(ctx context.Context) *ent.Client {
-	client, _ := c.GetTx(ctx, "")
+	client, _, _ := c.GetTx(ctx, "")
 	return client
 }
 
-func (c *clientWrapper) GetTx(ctx context.Context, txnRequiredReason string) (client *ent.Client, err error) {
+func (c *clientWrapper) GetTx(ctx context.Context, txnRequiredReason string) (client *ent.Client, inTxn bool, err error) {
 	// First check for transactional client (set by WithTransaction)
-	txI := ctx.Value("tx")
-	if txI != nil {
-		tx, ok := txI.(*ent.Client)
-		if !ok {
-			return nil, fmt.Errorf("context transaction exists, but expected type *ent.Client, got: %T", tx)
-		}
-		return tx, nil
+	if txClient, ok := ctx.Value(txcKey).(*ent.Client); ok {
+		return txClient, true, nil
 	}
+	// TODO: remove, unused
 	if txnRequiredReason != "" {
-		return nil, fmt.Errorf("no txn found, but required for: %s", txnRequiredReason)
+		return nil, false, fmt.Errorf("no txn found, but required for: %s", txnRequiredReason)
 	}
-	return c.dbClient, nil
+	return c.dbClient, false, nil
 }

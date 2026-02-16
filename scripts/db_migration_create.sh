@@ -19,7 +19,7 @@ done
 
 # Not strictly necessary, but will probably save someone's butt at leat once
 echo "first running 'go generate ./ent'"
-go generate ./ent
+./scripts/db_codegen.sh
 
 atlas migrate diff $1 --dir "file://ent/migrate/migrations" --to "ent://ent/schema" --dev-url "sqlite://file?mode=memory&_fk=1"
 
