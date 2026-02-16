@@ -3,7 +3,7 @@
 syntax = "proto3";
 
 // package <organization>.<repo>[.<service>];
-package foocompany.template;
+package counter;
 
 option go_package = "rpc/counter";
 

@@ -1,5 +1,5 @@
-import { TwirpFetchTransport } from '@protobuf-ts/twirp-transport';
-import { CounterClient } from "../codegen/countservice.client";
+import { FetchRPC } from 'twirp-ts';
+import { CounterClientJSON } from '../codegen/countservice.twirp';
 
 function isDevMode() {
   // We assume we're only on a port in dev mode.
@@ -22,16 +22,8 @@ export function getRpcHost() {
   return url;
 }
 
-function getTransport(path: string) {
-  return new TwirpFetchTransport({
-    baseUrl: getRpcHost() + path,
-    // this is only necessary because in dev we run the UI and RPC servers on
-    // different ports.
-    fetchInit: { credentials: 'include' },
-  });
-}
-
-export const client = new CounterClient(getTransport("/rpc/"));
-// other clients can be added with different prefixes like
-// export const counterClient = new CounterClient(getTransport("/rpc/counter/");
-// export const otherClient = new OtherClient(getTransport("/rpc/other/");
+export const counterClient = new CounterClientJSON(FetchRPC({
+  baseUrl: getRpcHost() + "/rpc",
+  credentials: "include",
+}));
+// other clients can be added with different prefixes...

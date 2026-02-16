@@ -12,16 +12,20 @@ do
   fi
 done
 
-PROTO_DIR="rpc/count"
-PROTO_PATH="${PROTO_DIR}/countservice.proto"
-
 CODEGEN_DIR_GO="."
-CODEGEN_DIR_TS="./src/codegen"
+CODEGEN_DIR_TS="./_ui/src/codegen"
+PROTOC_GEN_TWIRP_BIN="./_ui/node_modules/.bin/protoc-gen-twirp_ts"
+PROTOC_GEN_TS_BIN="./_ui/node_modules/.bin/protoc-gen-ts"
 
-# Go code generation
-protoc --twirp_out=. --twirp_opt=paths=source_relative --go_out=${CODEGEN_DIR_GO} --go_opt=paths=source_relative ${PROTO_PATH}
+function codegen() {
+  PROTO_DIR="$1"
+  PROTO_PATH="${PROTO_DIR}/$2"
+  echo "Generating code for ${PROTO_PATH}..."
+  # Go
+  protoc --twirp_out=. --twirp_opt=paths=source_relative --go_out=${CODEGEN_DIR_GO} --go_opt=paths=source_relative ${PROTO_PATH}
+  # TS
+  protoc -I ${PROTO_DIR} --plugin=protoc-gen-ts=${PROTOC_GEN_TS_BIN} --plugin=protoc-gen-twirp_ts=${PROTOC_GEN_TWIRP_BIN} --ts_out=${CODEGEN_DIR_TS} --twirp_ts_out=./${CODEGEN_DIR_TS} ${PROTO_PATH}
+}
 
-# TS code generation
-pushd _ui
-npx protoc --ts_out ${CODEGEN_DIR_TS} --proto_path ../${PROTO_DIR} ../${PROTO_PATH}
-popd
+codegen "rpc/count" "countservice.proto"
+
