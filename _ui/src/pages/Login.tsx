@@ -1,34 +1,16 @@
 import { useState } from "react";
-import { getRpcHost } from '../lib/rpc_client'
-import { setCookie } from "../lib/cookie";
-import { useNavigate } from "react-router";
+import { publicClient } from '../lib/rpc_client'
 
-export default function Login() {
+export default function Login({ afterLogin }: { afterLogin: (val: boolean) => void }) {
   const [error, setError] = useState('');
   const [username, setUsername] = useState('meuser');
   const [password, setPassword] = useState('pass123');
-  const navigate = useNavigate();
 
   async function doLogin(e: React.MouseEvent) {
     e.preventDefault();
     try {
-      const response = await fetch(getRpcHost() + "/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-        // this must be included to set the cookie returned from the
-        // rpc host when it's on a different port than the ui host
-        // (i.e. dev environment)
-        credentials: "include",
-      });
-      if (response.status === 200) {
-        setCookie();
-        navigate("/");
-      } else {
-        setError(`error: ${response.text}`);
-      }
+      const resp = await publicClient.Login({ username, password });
+      if (resp.authenticated) afterLogin(true);
     } catch (err) {
       setError(`${err}`);
     }

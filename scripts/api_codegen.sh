@@ -27,5 +27,6 @@ function codegen() {
   protoc -I ${PROTO_DIR} --plugin=protoc-gen-ts=${PROTOC_GEN_TS_BIN} --plugin=protoc-gen-twirp_ts=${PROTOC_GEN_TWIRP_BIN} --ts_out=${CODEGEN_DIR_TS} --twirp_ts_out=./${CODEGEN_DIR_TS} ${PROTO_PATH}
 }
 
-codegen "rpc/count" "countservice.proto"
+codegen "rpc/public" "public.proto"
+codegen "rpc/user" "user.proto"
 

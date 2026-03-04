@@ -13,7 +13,7 @@ func InitJWT(secretKey string) {
 	key = secretKey
 }
 
-func buildToken(id, name, email, role string, expires time.Time) (string, error) {
+func BuildToken(id, name, email, role string, expires time.Time) (string, error) {
 	key := []byte(key)
 	signer, err := jwt.NewSignerHS(jwt.HS256, key)
 	if err != nil {

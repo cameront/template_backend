@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { counterClient } from "../lib/rpc_client";
+import { userClient } from "../lib/rpc_client";
 
 export default function Counter() {
   const [error, setError] = useState('');
@@ -12,7 +12,7 @@ export default function Counter() {
     async function load() {
       setLoading(true);
       try {
-        const val = await counterClient.GetValue({ name: counterName });
+        const val = await userClient.GetValue({ name: counterName });
         setCount(Number(val.value));
       } catch (err) {
         setError(`error: ${err}`);
@@ -29,7 +29,7 @@ export default function Counter() {
 
   async function incrementCounter() {
     try {
-      const res = await counterClient.Increment({ name: counterName, amount: BigInt(1) });
+      const res = await userClient.Increment({ name: counterName, amount: BigInt(1) });
       setCount(Number(res.value));
     } catch (err) {
       setError(`error: ${err}`);
@@ -39,7 +39,7 @@ export default function Counter() {
   return (
     <div className="flex justify-center mt-10">
       {error !== "" &&
-        <div className="max-w-[300px] error">{error}</div>
+        <div className="max-w-75 error">{error}</div>
       }
       {loading &&
         <div>Loading...</div>
@@ -56,7 +56,7 @@ export default function Counter() {
                 onChange={(e) => setTmpCounterName(e.target.value)}
               />
               <button
-                className="border p-2 rounded-md hover:bg-gray-50"
+                className="cusor-pointer border p-2 rounded hover:bg-gray-50"
                 onClick={() => updateCounter()}>Set</button>
             </div>
           </div>
@@ -67,7 +67,7 @@ export default function Counter() {
               Value: {count}
             </h5>
 
-            <button color="green" className="w-fit" onClick={() => incrementCounter()}
+            <button className="cursor-pointer border rounded p-2 w-fit hover:bg-gray-50" onClick={() => incrementCounter()}
             >Increment</button>
           </div>
         </div>

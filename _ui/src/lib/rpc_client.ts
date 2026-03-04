@@ -1,5 +1,6 @@
 import { FetchRPC } from 'twirp-ts';
-import { CounterClientJSON } from '../codegen/countservice.twirp';
+import { PublicClientJSON } from '../codegen/public.twirp';
+import { UserClientJSON } from '../codegen/user.twirp';
 
 function isDevMode() {
   // We assume we're only on a port in dev mode.
@@ -22,8 +23,13 @@ export function getRpcHost() {
   return url;
 }
 
-export const counterClient = new CounterClientJSON(FetchRPC({
-  baseUrl: getRpcHost() + "/rpc",
+export const publicClient = new PublicClientJSON(FetchRPC({
+  baseUrl: getRpcHost() + "/rpc/public",
+  credentials: "include",
+}));
+
+export const userClient = new UserClientJSON(FetchRPC({
+  baseUrl: getRpcHost() + "/rpc/user",
   credentials: "include",
 }));
 // other clients can be added with different prefixes...

@@ -1,0 +1,26 @@
+// This service defines endpoints that can be called without prior
+// authentication.
+
+// follow https://github.com/twitchtv/twirp/blob/main/docs/best_practices.md
+
+syntax = "proto3";
+
+// package <organization>.<repo>[.<service>];
+package public;
+
+option go_package = "rpc/public";
+
+service Public {
+  rpc Login(LoginRequest) returns (IdentityMessage);
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message IdentityMessage {
+  bool authenticated = 1;
+  string username = 2;
+  bool is_admin = 3;
+}

@@ -64,5 +64,5 @@ touch data/database.db
 { set +x; } 2>/dev/null
 
 printf "\nYou can run the backend with:\n  (source ./env-dev.sh && air)\n"
-printf "And the frontend with: \n  npm run dev\n"
+printf "And the frontend with: \n  pnpm run dev\n"
 printf "\nThis script can be deleted, and you should probably set the new upstream: \"git remote set-url origin https://github.com/${REPO_NAME}.git\"\n"

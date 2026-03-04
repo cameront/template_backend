@@ -1,6 +1,6 @@
 module github.com/cameront/template_backend
 
-go 1.23.4
+go 1.26.0
 
 require (
 	entgo.io/ent v0.14.0

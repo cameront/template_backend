@@ -2,43 +2,53 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	stdlog "log"
+	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"sync/atomic"
+	"syscall"
 	"time"
 
-	"github.com/cameront/template_backend/auth"
 	"github.com/cameront/template_backend/config"
 	"github.com/cameront/template_backend/logging"
 	"github.com/cameront/template_backend/static"
 	"github.com/cameront/template_backend/store"
 	"github.com/rs/cors"
 
-	"github.com/cameront/template_backend/rpc_internal/counterservice"
+	rpcpublic "github.com/cameront/template_backend/rpc_internal/public"
+	rpcuser "github.com/cameront/template_backend/rpc_internal/user"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var isShuttingDown atomic.Bool
+
 func main() {
-	ctx, err := config.InitConfig(context.Background())
-	panicIf(err, "error initializing config")
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	ctx, err := config.InitConfig(ctx)
+	panicIf(err, "initializing config")
 	cfg := config.MustContext(ctx)
 
-	logger := logging.InitLogging(cfg.LOG_OutputFormat, cfg.LOG_MinLevel)
+	logging.InitLogging(cfg.LOG_OutputFormat, cfg.LOG_MinLevel)
 
 	dbClient, err := store.InitStore(ctx)
 	panicIf(err, "initializind db")
 
-	// receiving a signal on this channel keeps the server alive for another
-	// IdleTimeoutMS
-	requestsReceived := make(chan struct{}, 5)
-
 	mux := http.NewServeMux()
 
-	apiClose, err := counterservice.InitApi(ctx, dbClient, mux, cfg.RPC_PathPrefix, requestsReceived)
-	panicIf(err, "initializing api")
+	serveHealth(mux)
 
-	mux.Handle("POST /login", auth.LoginHandler())
+	err = rpcpublic.InitApi(ctx, dbClient, mux, "/rpc/public")
+	panicIf(err, "initializing public api")
+
+	err = rpcuser.InitApi(ctx, dbClient, mux, "/rpc/user")
+	panicIf(err, "initializing user api")
 
 	static.InitStatic(ctx, mux, cfg.HTTP_StaticDir)
 
@@ -47,49 +57,53 @@ func main() {
 		AllowedMethods:   []string{http.MethodPost, http.MethodOptions},
 		AllowCredentials: true,
 	})
+
 	addr := fmt.Sprintf("%s:%s", cfg.RPC_Host, cfg.RPC_Port)
-	httpServer := &http.Server{Addr: addr, Handler: c.Handler(mux)}
-
-	closeServer := func() error {
-		err := httpServer.Close()
-		if err != http.ErrServerClosed {
-			return err
-		}
-		return apiClose()
+	httpServer := &http.Server{
+		Addr:        addr,
+		BaseContext: func(net.Listener) context.Context { return ctx },
+		Handler:     c.Handler(mux),
 	}
-	go startCloseTimer(ctx, cfg.HTTP_IdleShutdownMS, requestsReceived, []func() error{closeServer})
 
-	logger.Info(fmt.Sprintf("listening on %s", addr))
-	err = httpServer.ListenAndServe()
-	if err != http.ErrServerClosed {
-		panicIf(err, "server")
-	}
+	runServer(ctx, httpServer)
 }
 
-// startCloseTimer calls all the closeFns provided if nothing is read from the
-// requests channel within shutdownMS. This is helpful on fly.io's firecracker
-// VMs so that we're only paying for used server time.
-func startCloseTimer(ctx context.Context, shutdownMS int64, requests <-chan struct{}, closeFns []func() error) {
-	if shutdownMS <= 0 {
-		shutdownMS = 3000000000000 // ~100 years
-	}
-	duration := time.Duration(shutdownMS) * time.Millisecond
+func runServer(ctx context.Context, server *http.Server) {
+	go func() {
+		logging.Infof(ctx, "server listening at %s", server.Addr)
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			panicIf(err, "server listening")
+		}
+		logging.Infof(ctx, "stopped serving new connections")
+	}()
 
-	t := time.NewTicker(time.Duration(duration))
-	for {
-		select {
-		case <-requests:
-			t.Reset(duration)
-		case <-t.C:
-			logging.GetLogger(ctx).Info(fmt.Sprintf("shutting down after %d ms", shutdownMS))
-			for i, fn := range closeFns {
-				if err := fn(); err != nil {
-					logging.GetLogger(ctx).Error("error calling close fn %d: %v", i, err)
-				}
-			}
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+	isShuttingDown.Store(true)
+
+	shutdownCtx, shutdownRelease := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownRelease()
+
+	// somewhere here we should be releasing resources
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		server.Close()
+		panicIf(err, "shutting down server")
+	}
+
+	logging.Infof(ctx, "shutdown completed gracefully")
+}
+
+func serveHealth(mux *http.ServeMux) {
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		if isShuttingDown.Load() {
+			http.Error(w, "shutting down", http.StatusServiceUnavailable)
 			return
 		}
-	}
+		time.Sleep(5 * time.Second)
+		fmt.Fprintln(w, "OK")
+	})
 }
 
 func panicIf(err error, reason string) {

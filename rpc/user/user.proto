@@ -3,13 +3,22 @@
 syntax = "proto3";
 
 // package <organization>.<repo>[.<service>];
-package counter;
+package user;
 
-option go_package = "rpc/counter";
+option go_package = "rpc/user";
 
-service Counter {
+service User {
+  rpc WhoAmI(Empty) returns (Identity);
+  rpc Logout(Empty) returns (Empty);
   rpc GetValue(CounterRequest) returns (CounterValue);
   rpc Increment(IncrementRequest) returns (CounterValue);
+}
+
+message Empty {}
+
+message Identity {
+  string username = 1;
+  bool is_admin = 2;
 }
 
 message CounterRequest {

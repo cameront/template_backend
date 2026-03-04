@@ -1,14 +1,15 @@
-package counterservice
+package user
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/cameront/template_backend/auth"
 	"github.com/cameront/template_backend/ent"
-	rpc "github.com/cameront/template_backend/rpc/count"
+	"github.com/cameront/template_backend/logging"
+	rpc "github.com/cameront/template_backend/rpc/user"
 	internal "github.com/cameront/template_backend/rpc_internal"
 	"github.com/cameront/template_backend/store"
 
@@ -20,31 +21,42 @@ type Server struct {
 	db store.DbProvider
 }
 
-func InitApi(ctx context.Context, dbProvider store.DbProvider, mux *http.ServeMux, pathPrefix string, requestsReceived chan<- struct{}) (func() error, error) {
+func InitApi(ctx context.Context, dbProvider store.DbProvider, mux *http.ServeMux, pathPrefix string) error {
 
 	server := &Server{db: dbProvider}
-	rpcHandler := rpc.NewCounterServer(server,
+	rpcHandler := rpc.NewUserServer(server,
 		twirp.WithServerInterceptors(
-			internal.NewSignalInterceptor(requestsReceived),
 			internal.NewLoggingInterceptor()),
 		twirp.WithServerPathPrefix(pathPrefix))
 
-	if !strings.HasPrefix(pathPrefix, "/") {
-		return nil, fmt.Errorf("path prefix (%s) must begin with '/'", pathPrefix)
-	}
-	if strings.HasSuffix(pathPrefix, "/") {
-		return nil, fmt.Errorf("path prefix (%s) must not end with '/'", pathPrefix)
-	}
+	internal.HandleTwitchRPCAtPrefix(mux, pathPrefix, auth.UserAuthenticatingHandler(rpcHandler))
 
-	path := fmt.Sprintf("POST %s/", pathPrefix)
-	mux.Handle(path, auth.UserAuthenticatingHandler(rpcHandler))
+	return nil
+}
 
-	closeFn := func() error {
-		c := dbProvider.Get(ctx)
-		c.Close()
-		return nil
+func (s *Server) WhoAmI(ctx context.Context, req *rpc.Empty) (*rpc.Identity, error) {
+	if claims, ok := ctx.Value(auth.UserCtxKey).(*auth.UserClaims); ok {
+		return &rpc.Identity{
+			Username: claims.Name,
+			IsAdmin:  false,
+		}, nil
+	} else {
+		logging.Errorf(ctx, "how did a user bypass the authenticating handler!?")
+		return nil, twirp.InternalError("uh oh")
 	}
-	return closeFn, nil
+}
+
+func (s *Server) Logout(ctx context.Context, req *rpc.Empty) (*rpc.Empty, error) {
+	cookie := http.Cookie{
+		Name:    auth.AuthCookieName,
+		Expires: time.Unix(0, 0),
+		Value:   "",
+		Path:    "/",
+		MaxAge:  0,
+	}
+	twirp.AddHTTPResponseHeader(ctx, "Set-Cookie", cookie.String())
+
+	return &rpc.Empty{}, nil
 }
 
 func (s *Server) GetValue(ctx context.Context, req *rpc.CounterRequest) (*rpc.CounterValue, error) {
