@@ -8,14 +8,11 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
 
-  console.log('ahhoy/?')
   useEffect(() => {
     async function load() {
-      console.log('ahoy');
       setLoading(true);
       try {
         const resp = await userClient.WhoAmI({});
-        console.log(resp);
         setAuthenticated(true);
       } catch (err) {
         setAuthenticated(false);
