@@ -11,6 +11,10 @@ import (
 	"github.com/cameront/template_backend/config"
 	"github.com/cameront/template_backend/ent"
 	"github.com/cameront/template_backend/logging"
+
+	// We use modernc's sqlite library, but sqlite3ent implements
+	// mattn's url-pragma bindings for us.
+	_ "github.com/sqlite3ent/sqlite3"
 )
 
 /*

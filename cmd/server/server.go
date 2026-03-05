@@ -21,8 +21,6 @@ import (
 
 	rpcpublic "github.com/cameront/template_backend/rpc_internal/public"
 	rpcuser "github.com/cameront/template_backend/rpc_internal/user"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 var isShuttingDown atomic.Bool

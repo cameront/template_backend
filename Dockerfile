@@ -1,6 +1,6 @@
 ARG GO_VERSION=1.26
-ARG LITESTREAM_VERSION=v0.3.13
-ARG ATLAS_VERSION=0.28.1
+ARG LITESTREAM_VERSION=0.5.9
+ARG ATLAS_VERSION=1.1.5
 
 #
 # Stage 1 - build binary (on debian)
@@ -20,13 +20,13 @@ COPY static /app/static
 COPY store /app/store
 
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=readonly -v -o /app/server ./cmd/server
+RUN GOOS=linux GOARCH=amd64 go build -mod=readonly -v -o /app/server ./cmd/server
 
 
 #
 # Stage 2 - build frontend
 #
-FROM node:23-bookworm AS ui_builder
+FROM node:25-bookworm AS ui_builder
 
 WORKDIR /_ui
 COPY _ui/*.json _ui/*.js _ui/*.ts _ui/*.html /_ui
@@ -43,7 +43,7 @@ RUN npm run build
 FROM debian:bookworm-slim AS litestream_downloader
 
 ARG LITESTREAM_VERSION
-ADD https://github.com/benbjohnson/litestream/releases/download/${LITESTREAM_VERSION}/litestream-${LITESTREAM_VERSION}-linux-amd64.tar.gz /tmp/litestream.tar.gz
+ADD https://github.com/benbjohnson/litestream/releases/download/v${LITESTREAM_VERSION}/litestream-${LITESTREAM_VERSION}-linux-x86_64.tar.gz /tmp/litestream.tar.gz
 RUN tar -C /usr/local/bin -xzf /tmp/litestream.tar.gz
 
 

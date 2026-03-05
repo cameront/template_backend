@@ -1,4 +1,6 @@
 dbs:
-  - path: ${DB_FILE}
-    replicas:
-      - url: ${DB_REPLICA_URL}
+  - path: /path/to/local/db
+    replica:
+      url: s3://BUCKETNAME/PATHNAME
+      access-key-id: AKIAxxxxxxxxxxxxxxxx
+      secret-access-key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxxxxxxxx

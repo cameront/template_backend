@@ -12,7 +12,7 @@ export default function App() {
     async function load() {
       setLoading(true);
       try {
-        const resp = await userClient.WhoAmI({});
+        await userClient.WhoAmI({});
         setAuthenticated(true);
       } catch (err) {
         setAuthenticated(false);
