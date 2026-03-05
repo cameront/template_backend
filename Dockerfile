@@ -70,7 +70,7 @@ COPY ent/migrate/migrations /app/migrations
 COPY docker_entrypoint /app/docker_entrypoint
 COPY static/ /app/static
 #COPY gcp_service_account_database_replicator.json /app/_creds/gcp_service_account_database_replicator.json
-#COPY ./litestream.yml /etc/litestream.yml
+COPY ./litestream.yml /etc/litestream.yml
 
 WORKDIR /app
 

@@ -16,4 +16,4 @@ export LOG_OUTPUT_FORMAT="text"
 
 export RPC_HOST=""
 export RPC_PORT="5001"
-export RPC_PATH_PREFIX="/rpc"
+

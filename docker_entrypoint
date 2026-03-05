@@ -9,20 +9,18 @@ set -e
 set -x
 
 echo "db url is $DB_FILE"
-if [[ -f ${DB_FILE} ]]; then
-  # We're seeing an issue sometimes when the db path already exists (before
-  # restoration). I think it's probably in situations when we have a failed
-  # deployment, and so the container had previously restored. In that case,
-  # just delete the db so that the restore can succeed below.
-  echo "db file already exists. removing it."
-  rm -f "$DB_FILE"
-fi
 
+if [[ -f "/etc/litestream.yml" ]]; then
+  echo "litestream enabled."
 
-if [[ -n ${DB_REPLICA_URL} ]]; then
-  echo "litestream enabled. restoring from replica url ${DB_REPLICA_URL}"
-  # Restore database from S3.
-  litestream restore -if-replica-exists "${DB_FILE}"
+  # Usually for fly.io setups, we have our db file stored on a persistent
+  # volume, so we only want to restore in a disaster recovery scenario.
+  if [[ -f ${DB_FILE} ]]; then
+    echo "db file already exists. not restoring from replica url"
+  else
+    echo "db file does not exist. restoring from replica url"
+    litestream restore -if-replica-exists "${DB_FILE}"
+  fi
 
   echo "running migrations"
   /atlas migrate apply --dir "file:///app/migrations" --url "sqlite://${DB_FILE}?_fk=1&_journal_mode=WAL"

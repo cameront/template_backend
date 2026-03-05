@@ -1,6 +1,6 @@
 dbs:
-  - path: /path/to/local/db
+  - path: ${DB_FILE}
     replica:
-      url: s3://BUCKETNAME/PATHNAME
+      url: s3://BUCKETNAME/PATHNAME?endpoint=t3.storage.dev&region=auto
       access-key-id: AKIAxxxxxxxxxxxxxxxx
       secret-access-key: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/xxxxxxxxx

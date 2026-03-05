@@ -25,7 +25,6 @@ type Config struct {
 	LOG_OutputFormat string `env:"LOG_OUTPUT_FORMAT"`
 
 	RPC_Host       string `env:"RPC_HOST"`
-	RPC_PathPrefix string `env:"RPC_PATH_PREFIX" envDefault:"/rpc"`
 	RPC_Port       string `env:"RPC_PORT" envDefault:"4001"`
 }
 
