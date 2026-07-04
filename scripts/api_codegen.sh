@@ -24,7 +24,7 @@ function codegen() {
   # Go
   protoc --twirp_out=. --twirp_opt=paths=source_relative --go_out=${CODEGEN_DIR_GO} --go_opt=paths=source_relative ${PROTO_PATH}
   # TS
-  protoc -I ${PROTO_DIR} --plugin=protoc-gen-ts=${PROTOC_GEN_TS_BIN} --plugin=protoc-gen-twirp_ts=${PROTOC_GEN_TWIRP_BIN} --ts_out=${CODEGEN_DIR_TS} --twirp_ts_out=./${CODEGEN_DIR_TS} ${PROTO_PATH}
+  protoc -I ${PROTO_DIR} --plugin=protoc-gen-ts=${PROTOC_GEN_TS_BIN} --plugin=protoc-gen-twirp_ts=${PROTOC_GEN_TWIRP_BIN} --ts_opt=ts_nocheck --ts_out=${CODEGEN_DIR_TS} --twirp_ts_out=./${CODEGEN_DIR_TS} ${PROTO_PATH}
 }
 
 codegen "rpc/public" "public.proto"
